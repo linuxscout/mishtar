@@ -9,6 +9,7 @@ Chunking is to extract named entities and temporal expression.
     taha dot zerrouki at gmail dot com
 
 Features |   value
+------------|-----------
 Authors  | Taha Zerrouki: http://tahadz.com,  taha dot zerrouki at gmail dot com
 Release  | 0.3
 License  |[GPL](https://github.com/linuxscout/mishtar/master/LICENSE)
@@ -17,6 +18,7 @@ Website  |[https://pypi.python.org/pypi/mishtar](https://pypi.python.org/pypi/mi
 Source  |[Github](http://github.com/linuxscout/mishtar)
 Feedbacks  |[Comments](https://github.com/linuxscout/mishtar/issues)
 Accounts  |[@Twitter](https://twitter.com/linuxscout)  [@Sourceforge](http://sourceforge.net/projects/mishtar/)
+
 <!--Doc  |[package Documentaion](http://pythonhosted.org/mishtar/)-->
 <!--Download  |[pypi.python.org](https://pypi.python.org/pypi/mishtar)-->
 
