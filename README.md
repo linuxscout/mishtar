@@ -14,11 +14,12 @@ Release  | 0.3
 License  |[GPL](https://github.com/linuxscout/mishtar/master/LICENSE)
 Tracker  |[linuxscout/mishtar/Issues](https://github.com/linuxscout/mishtar/issues)
 Website  |[https://pypi.python.org/pypi/mishtar](https://pypi.python.org/pypi/mishtar)
-<!--Doc  |[package Documentaion](http://pythonhosted.org/mishtar/)-->
 Source  |[Github](http://github.com/linuxscout/mishtar)
-<--Download  |[pypi.python.org](https://pypi.python.org/pypi/mishtar)-->
 Feedbacks  |[Comments](https://github.com/linuxscout/mishtar/issues)
 Accounts  |[@Twitter](https://twitter.com/linuxscout)  [@Sourceforge](http://sourceforge.net/projects/mishtar/)
+<!--Doc  |[package Documentaion](http://pythonhosted.org/mishtar/)-->
+<!--Download  |[pypi.python.org](https://pypi.python.org/pypi/mishtar)-->
+
 
 
 <!--
@@ -38,14 +39,16 @@ or in bibtex format
   year={2010}
 }
 ```
-
+-->
 
 ## مزايا
-* 
+* استخلاص المسميات
+* استخلاص العبارات الزمنية (تواريخ ميلادية وهجرية، ونسبية)
 
 ## Features
-* 
--->
+* Extract named entities
+* Extract Tempral expressions
+
 Applications
 ====
 * Text mining.
