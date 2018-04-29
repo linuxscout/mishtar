@@ -14,14 +14,14 @@ Release  | 0.3
 License  |[GPL](https://github.com/linuxscout/mishtar/master/LICENSE)
 Tracker  |[linuxscout/mishtar/Issues](https://github.com/linuxscout/mishtar/issues)
 Website  |[https://pypi.python.org/pypi/mishtar](https://pypi.python.org/pypi/mishtar)
-Doc  |[package Documentaion](http://pythonhosted.org/mishtar/)
+<!--Doc  |[package Documentaion](http://pythonhosted.org/mishtar/)-->
 Source  |[Github](http://github.com/linuxscout/mishtar)
-Download  |[pypi.python.org](https://pypi.python.org/pypi/mishtar)
+<--Download  |[pypi.python.org](https://pypi.python.org/pypi/mishtar)-->
 Feedbacks  |[Comments](https://github.com/linuxscout/mishtar/issues)
 Accounts  |[@Twitter](https://twitter.com/linuxscout)  [@Sourceforge](http://sourceforge.net/projects/mishtar/)
 
 
-
+<!--
 ## Citation
 If you would cite it in academic work, can you use this citation
 ```
@@ -45,7 +45,7 @@ or in bibtex format
 
 ## Features
 * 
-
+-->
 Applications
 ====
 * Text mining.
@@ -74,13 +74,13 @@ You can test it on [Mishkal Site](http://tahadz.com/mishkal), choose: Tool > ext
 ![mishtar Demo](images/mishtar_demo.png "mishtar Demo")
 
 
-
+<!--
 Installation
 =====
 ```
 pip install mishtar
 ```    
-    
+    -->
 Usage
 =====
 ```python
