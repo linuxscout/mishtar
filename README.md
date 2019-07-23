@@ -76,7 +76,7 @@ Demo جرّب
 يمكن التجربة على [موقع مشكال](http://tahadz.com/mishkal)
 ، اختر أدوات، ثم استخلاص ثم المكونات
 You can test it on [Mishkal Site](http://tahadz.com/mishkal), choose: Tool > extraction > Entities
-![mishtar Demo](images/mishtar_demo.png "mishtar Demo")
+![mishtar Demo](doc/images/mishtar_demo.png "mishtar Demo")
 
 
 <!--

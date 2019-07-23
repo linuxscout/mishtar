@@ -213,22 +213,22 @@ if __name__ == '__main__':
         u"صرّح الأمير تشارلز الأول",
     ]
     for text1 in TEXTS:
-        #~ print "#######"
-        #~ positions_named = named.detect_named_position(text1.split(' '))
-        #~ print(positions_named)
-        #~ text1 = araby.strip_tashkeel(text1)
+        print "#######"
+        positions_named = named.detect_named_position(text1.split(' '))
+        print(positions_named)
+        text1 = araby.strip_tashkeel(text1)
 
 
-        #~ result = named.pretashkeel_named(araby.tokenize(text1))
-        #~ print(u' '.join(result))
+        result = named.pretashkeel_named(araby.tokenize(text1))
+        print(u' '.join(result))
 
         word_list = araby.tokenize(text1)
-        #~ tag_list = named.detect_named(word_list)
+        tag_list = named.detect_named(word_list)
 
-        #~ tuples = (zip(tag_list, word_list))
-        #~ for tup in tuples:
-            #~ print repr(tup).decode('unicode-escape').encode('utf8')
-        #~ print "***********"
+        tuples = (zip(tag_list, word_list))
+        for tup in tuples:
+            print repr(tup).decode('unicode-escape').encode('utf8')
+        print "***********"
         chunker = myNamed()
         tag_list2 = chunker.detect_chunks(word_list)
         print chunker.detect_positions(word_list)

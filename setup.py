@@ -7,7 +7,7 @@ def readme():
     with open('README.rst') as f:
         return f.read()
         
-setup (name='mishtar', version='0.6.4',
+setup (name='mishtar', version='0.1',
       author='Taha Zerrouki',
       author_email='taha_zerrouki@hotmail.com',
       url='http://pypi.python.com/projects/mishtar/',

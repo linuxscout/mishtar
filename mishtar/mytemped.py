@@ -36,6 +36,9 @@ class myTemped(chunked.Chunked):
     A general chunk class to detect phrases in many forms, like named, numbers, temporal, etc.
     """
     def __init__(self,):
+        #~ super(chunked.Chunked).__init__()
+        #~ super(myTemped, self).__init__()
+        chunked.Chunked.__init__(self,)
         self.begintag = "NB"
         self.intertag = "NI"
     
@@ -71,6 +74,7 @@ class myTemped(chunked.Chunked):
             return True
         if word in tconst.MONTHS:
             return True
+        # calendar test if Heh for hijir or meem for Miladi
         if word.endswith(araby.MEEM) or word.endswith(araby.HEH):
             if word[:-1].isnumeric():
                 return True
@@ -85,7 +89,7 @@ class myTemped(chunked.Chunked):
         #كلمة من لا تدخل إلا أذا سبقها ما يدل على الزمن
         # مثل السابع من شهر
         #الحرف / يستعمل للتفريق بين تسميتين للشهر
-        if word in (u'من',u"/", u"شهر", u"والعشرون", u"والثلاثون"):
+        if word in tconst.MIDDLE_WORDS:
             return True
         # يدخل العدد في العبارة إذا سبقه شيء موسوم
         if word.isnumeric():
@@ -100,21 +104,27 @@ class myTemped(chunked.Chunked):
         """
         if not previous:
             return False
-            
-        if previous[0] in (u'و', u'ف', u'ل', u'ب', u'ك', u"ال"):
+        # one letter prefixes
+        if previous[0] in  tconst.PREFIXES:
            previous = previous[1:]
+        # prefix wit two letters
+        if previous[:1] in  tconst.PREFIXES:
+           previous = previous[2:]
         compsd = u" ".join([previous, word])
         # من شهر
-        if previous in (u'من',) and word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة"  ):
+        if previous in (u'من', u'في') and word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة"  ):
            return True
         # من رمضان
-        if previous in (u'من',) and word in tconst.MONTHS:
+        if previous in (u'من',u'في') and word in tconst.MONTHS:
            return True
         # اليوم عدد والشهر كلمة
         if previous.isnumeric() and word in tconst.MONTHS:
             return True
         #سنة وبعدها عدد
-        if previous in (u"سنة", u"السنة", u"عام", u"العام") and word.isnumeric():
+        if previous in tconst.PRE_NUMERIC and word.isnumeric():
+            return True
+        #سنة وبعدها عدد  وفي أخره ميم أو هاء
+        if previous in tconst.PRE_NUMERIC and word[:-1].isnumeric() and word[-1:] in (u'م',u'ه'):
             return True
         #عدد وبعده تقويم
         #مثل  ميلادي
@@ -175,7 +185,46 @@ class myTemped(chunked.Chunked):
         """
         newlist = wordlist
         return newlist
+        
+    def detect_positions(self, wordlist, debug=False):
+        """
+        Detect named enteties words in a text and return positions of each phrase.
 
+        Example:
+            >>> detect_positions(wordlist)
+            ((1,3), (6,8))
+        @param wordlist: wordlist
+        @type wordlist: unicode list
+        @return: list of numbers clause positions [(start,end),(start2,end2),]
+        @rtype: list of tuple
+        """
+        positions = []
+        start = -1
+        end = -1
+        taglist = self.detect_chunks(wordlist)
+        if debug:
+            print("N", "tag", "start", "end", "word")        
+        for i, tag in enumerate(taglist):
+            # 
+            if tag == self.begintag:
+                if start < 0:
+                    start = i
+                end = i
+            elif tag == self.intertag:
+                end = i
+                if start < 0:
+                    start = i
+                #~ start = -1
+            elif start >= 0:
+                    positions.append((start, end))
+                    start = -1
+                    end = -1
+            if debug:
+                print(i, tag, start, end, wordlist[i].encode('utf8'))
+        # add the final phrases
+        if start >= 0:   #There are a previous number phrase.
+            positions.append((start, end))
+        return positions
 
 
 if __name__ == '__main__':
