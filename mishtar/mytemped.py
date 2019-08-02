@@ -50,10 +50,10 @@ class myTemped(chunked.Chunked):
         """
         key = word
         # if the word is precedded by a prefix, we extract the prefix and 
-        if word[0] in (u'و', u'ف', u'ل', u'ب', u'ك'):
+        if word[0] in tconst.PREFIXES:
            key = word[1:]
         # كلمة ابن لا تأتي هكذا إلا في البداية
-        if key in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة"  ):
+        if key in tconst.ORDINAL2 or key in tconst.ORDINAL or key in tconst.ORDINAL1  or key in tconst.AWQAT or key in tconst.TEMPS :
            return True
         # if the word is  a word tag or as a prefixed word
         if self.is_wordtag(key):
@@ -66,18 +66,37 @@ class myTemped(chunked.Chunked):
         return if the word is a word tag any where
         @param word: the given word
         @type word: unicode
+        
         """
+        
         # some words
-        if word in (u'شهر', u'يوم', ):
+        if word in (u"شهر",u"عشرة",u"يوم",u"سنة",u"عام",u"اليوم",u"الشهر",u"العام",u"السنة",u"للسنة" ):
             return True
         if word in tconst.DAYS:
             return True
         if word in tconst.MONTHS:
             return True
+        if word in tconst.YEARS:
+            return True
+        if word in tconst.CALENDERS:
+            return True
+        if word in tconst.PRE_NUMERIC:
+            return True
+        if word in tconst.TEMPS:
+            return True
+        if word in tconst.AWQAT:
+            return True
+        if word in tconst.ORDINAL2:
+            return True
+        return False
         # calendar test if Heh for hijir or meem for Miladi
         if word.endswith(araby.MEEM) or word.endswith(araby.HEH):
             if word[:-1].isnumeric():
                 return True
+       
+    
+        if word and  word[0].isnumeric()  and word[1].isnumeric()  and word[2] in (u':')and word[3].isnumeric():
+            return True
         return False
 
     def is_middle_wordtag(self, word):
@@ -86,6 +105,7 @@ class myTemped(chunked.Chunked):
         @param word: the given word
         @type word: unicode
         """
+        
         #كلمة من لا تدخل إلا أذا سبقها ما يدل على الزمن
         # مثل السابع من شهر
         #الحرف / يستعمل للتفريق بين تسميتين للشهر
@@ -111,8 +131,11 @@ class myTemped(chunked.Chunked):
         if previous[:1] in  tconst.PREFIXES:
            previous = previous[2:]
         compsd = u" ".join([previous, word])
+
         # من شهر
         if previous in (u'من', u'في') and word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة"  ):
+           return True
+        if previous in (u'من', u'في') and word in tconst.ORDINAL2 :
            return True
         # من رمضان
         if previous in (u'من',u'في') and word in tconst.MONTHS:
@@ -120,19 +143,46 @@ class myTemped(chunked.Chunked):
         # اليوم عدد والشهر كلمة
         if previous.isnumeric() and word in tconst.MONTHS:
             return True
+        if previous.isnumeric() and word in tconst.ORDINAL2:
+            return True
+      
         #سنة وبعدها عدد
         if previous in tconst.PRE_NUMERIC and word.isnumeric():
+            return True
+        ###
+        if previous in tconst.ORDINAL2 and word in (u'طويلة', u'قصيرة',u'طويلا', u'قصيرا',u"قليلة"):
+            return True
+        ###
+        if previous in tconst.CALENDERS and tconst.ORDINAL :
+            return True
+        ####
+        if previous in tconst.CALENDERS and tconst.ORDINAL1 :
+            return True
+        # القرن العشرين
+        if previous in tconst.PRE_NUMERIC or previous in tconst.ORDINAL2 and word in tconst.ORDINAL1:
+            return True
+        #نة تقريباس 
+        if previous in tconst.ORDINAL2 and word in (u"تقريبا",u"بالتقريب",u"قاربت",u"تقارب") :
+            return True
+        if previous in tconst.PRE_NUMERIC and word in (u"خمس",u"سبع",u"ثمان",u"تسع",u"عشر",u"ست") :
+            return True
+        if previous in tconst.ORDINAL1 and word in (u"أيام",u"اعوام",u"ايام",u"أعوام",u"سنين",u"سنوات",u"شهور",u"يوما",u"عاما",u"أسبوعا",u"سنة",u"شهرا") :
+            return True
+        #وتسعة
+        if previous in tconst.PREFIXES and word in tconst.ORDINAL1 :
             return True
         #سنة وبعدها عدد  وفي أخره ميم أو هاء
         if previous in tconst.PRE_NUMERIC and word[:-1].isnumeric() and word[-1:] in (u'م',u'ه'):
             return True
+
+        
         #عدد وبعده تقويم
         #مثل  ميلادي
         if previous.isnumeric() and word in tconst.CALENDERS:
             return True
         if compsd in tconst.CALENDERS:
             return True
-            
+
         #شهر وبعده عدد
         if previous in tconst.MONTHS and word.isnumeric():
             return True
@@ -143,15 +193,36 @@ class myTemped(chunked.Chunked):
             return True            
         if previous in tconst.DAYS and word in tconst.ADJS:
             return True
-        if previous in ( u"السنة", u"العام") and word in tconst.ADJS:
+        if previous in tconst.ORDINAL2 and word in tconst.ADJS:
             return True
-            
+        if previous in tconst.ORDINAL2 and word in tconst.ORDINAL:
+            return True
+        if previous in tconst.ORDINAL and word in tconst.ORDINAL1:
+            return True
+        if previous in tconst.ORDINAL2 and word in tconst.ORDINAL1:
+            return True
         #عدد ترتيبي ثم حرف من
         if previous in  tconst.ORDINAL and word in (u"من",):
             return True
+
+
+        if previous in  (u"في",) and word.isnumeric() :
+            return True
+
+
+        if previous in  tconst.PREFIXES and word in tconst.TEMPS:
+            return True
+
+
+        if previous in  tconst.TEMPS and word in tconst.ORDINAL:
+            return True
+
+
+        
         if compsd in tconst.ORDINAL:
             return True
-        
+        if compsd in tconst.COMPOSED:
+            return True
         return False
 
     @staticmethod
@@ -189,7 +260,6 @@ class myTemped(chunked.Chunked):
     def detect_positions(self, wordlist, debug=False):
         """
         Detect named enteties words in a text and return positions of each phrase.
-
         Example:
             >>> detect_positions(wordlist)
             ((1,3), (6,8))
@@ -308,10 +378,8 @@ if __name__ == '__main__':
         tag_list2 = chunker.detect_chunks(word_list)
         result = chunker.extract_chunks(text1)
         if result != predef_result:
-            print("predef", repr(predef_result).decode('unicode-escape').encode('utf8'))
-            print("treatd", repr(result).decode('unicode-escape').encode('utf8') )
+            print("predef", repr(predef_result))
+            print("treatd", repr(result) )
             tuples = (zip(tag_list2, word_list))
             for tup in tuples:
-                print(repr(tup).decode('unicode-escape').encode('utf8')           )
-
-
+                print(repr(tup)         )
