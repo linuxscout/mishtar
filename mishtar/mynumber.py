@@ -18,19 +18,15 @@ copyright 2009 Khaled Al-Shamaa
 from __future__ import absolute_import
 
 import math
+import pyarabic.araby as araby
+import pyarabic.number_const as nbconst
+import pyarabic.named_const as nmconst
+import pyarabic.number as number
 if __name__ == '__main__':
     import sys
     sys.path.append('../')
-    import pyarabic.araby as araby
-    import pyarabic.number_const as nbconst
-    import pyarabic.named_const as nmconst
-    import pyarabic.number as number
     import chunked
 else:
-    from . import araby
-    from . import number_const as nbconst
-    from . import named_const as nmconst
-    from . import number
     from . import chunked
     
 
@@ -74,7 +70,7 @@ class myNumber(chunked.Chunked):
                 return True
         return False
 
-    def is_middle_wordtag(self, word):
+    def is_middle_wordtag(self, word, next_tag=""):
         """
         return if the word is a word tag only if there is a chunk
         @param word: the given word
@@ -82,7 +78,7 @@ class myNumber(chunked.Chunked):
         """
         return False
 
-    def is_middle_tuple_tag(self, word, previous):
+    def is_middle_tuple_tag(self, word, previous, next_tag=""):
         """
         return if the word is a word tag only if there the previous word is an indicator
         @param word: the given word

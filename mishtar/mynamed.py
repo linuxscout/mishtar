@@ -82,7 +82,7 @@ class myNamed(chunked.Chunked):
             return True
         return False
 
-    def is_middle_wordtag(self, word):
+    def is_middle_wordtag(self, word, next_tag=""):
         """
         return if the word is a word tag only if there is a chunk
         @param word: the given word
@@ -92,7 +92,7 @@ class myNamed(chunked.Chunked):
             return True
         return False
 
-    def is_middle_tuple_tag(self, word, previous):
+    def is_middle_tuple_tag(self, word, previous,next_tag=""):
         """
         return if the word is a word tag only if there the previous word is an indicator
         @param word: the given word

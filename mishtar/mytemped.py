@@ -99,7 +99,7 @@ class myTemped(chunked.Chunked):
             return True
         return False
 
-    def is_middle_wordtag(self, word):
+    def is_middle_wordtag(self, word, next_tag=""):
         """
         return if the word is a word tag only if there is a chunk
         @param word: the given word
@@ -109,14 +109,16 @@ class myTemped(chunked.Chunked):
         #كلمة من لا تدخل إلا أذا سبقها ما يدل على الزمن
         # مثل السابع من شهر
         #الحرف / يستعمل للتفريق بين تسميتين للشهر
-        if word in tconst.MIDDLE_WORDS:
+        if word in tconst.MIDDLE_WORDS and next_tag:
+            return True
+        if word in tconst.ORDINAL1 and next_tag =="number":
             return True
         # يدخل العدد في العبارة إذا سبقه شيء موسوم
         if word.isnumeric():
             return True
         return False
 
-    def is_middle_tuple_tag(self, word, previous):
+    def is_middle_tuple_tag(self, word, previous, next_tag=""):
         """
         return if the word is a word tag only if there the previous word is an indicator
         @param word: the given word
@@ -133,8 +135,10 @@ class myTemped(chunked.Chunked):
         compsd = u" ".join([previous, word])
 
         # من شهر
-        if previous in (u'من', u'في') and word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة"  ):
+        if previous in (u'من', u'في') and word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة" ,u"ليلة" ):
            return True
+        #~ if word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة" ,u"ليلة" ):
+           #~ return True
         if previous in (u'من', u'في') and word in tconst.ORDINAL2 :
            return True
         # من رمضان
@@ -149,14 +153,16 @@ class myTemped(chunked.Chunked):
         #سنة وبعدها عدد
         if previous in tconst.PRE_NUMERIC and word.isnumeric():
             return True
+        if previous in tconst.PRE_NUMERIC and word in tconst.ORDINAL:
+            return True
         ###
         if previous in tconst.ORDINAL2 and word in (u'طويلة', u'قصيرة',u'طويلا', u'قصيرا',u"قليلة"):
             return True
         ###
-        if previous in tconst.CALENDERS and tconst.ORDINAL :
+        if previous in tconst.CALENDERS and word in tconst.ORDINAL :
             return True
         ####
-        if previous in tconst.CALENDERS and tconst.ORDINAL1 :
+        if previous in tconst.CALENDERS and word in tconst.ORDINAL1 :
             return True
         # القرن العشرين
         if previous in tconst.PRE_NUMERIC or previous in tconst.ORDINAL2 and word in tconst.ORDINAL1:
@@ -180,7 +186,13 @@ class myTemped(chunked.Chunked):
         #مثل  ميلادي
         if previous.isnumeric() and word in tconst.CALENDERS:
             return True
+        if previous  in tconst.ORDINAL2  and word in tconst.CALENDERS:
+            return True
+        if previous  in tconst.ORDINAL1  and word in tconst.CALENDERS:
+            return True
         if compsd in tconst.CALENDERS:
+            return True
+        if compsd in tconst.MONTHS:
             return True
 
         #شهر وبعده عدد
@@ -208,6 +220,7 @@ class myTemped(chunked.Chunked):
 
         if previous in  (u"في",) and word.isnumeric() :
             return True
+
 
 
         if previous in  tconst.PREFIXES and word in tconst.TEMPS:
@@ -256,7 +269,59 @@ class myTemped(chunked.Chunked):
         """
         newlist = wordlist
         return newlist
+    def preprocess(self, wordlist):
+        """
+        Make preprocessing for some cases 
+        @param wordlist: the given wordl_ist
+        @type wordlist: unicode list
+        """
+        taglist = []
         
+        for word in wordlist:
+            
+            taglist.append(self.tag_word(word))
+
+        return wordlist, taglist
+        
+    def postprocess(self, wordlist, taglist):
+        """
+        Make preprocessing for some cases 
+        @param wordlist: the given wordl_ist
+        @type wordlist: unicode list
+        """
+        
+        return wordlist, taglist
+
+    def tag_word(self, word):
+        """
+        give a tag to word
+        """
+        word = araby.strip_tashkeel(word)
+        if word in (u"شهر",u"عشرة",u"يوم",u"سنة",u"عام",u"اليوم",u"الشهر",u"العام",u"السنة",u"للسنة",u"ليلة",u"للعام"):
+            return "tmp"
+        if word in tconst.DAYS:
+            return "tmp;day"
+        if word in tconst.MONTHS:
+            return "tmp;month"
+        if word in tconst.YEARS:
+            return "tmp;year"
+        if word in tconst.CALENDERS:
+            return "tmp;calender"
+        if word in tconst.TEMPS:
+            return "tmp"
+        if word in tconst.AWQAT:
+            return "tmp"
+        if word in tconst.ORDINAL:
+            return "number"
+        if word in tconst.ORDINAL1:
+            return "number"
+        if word in tconst.ORDINAL2:
+            return "number"
+        if word in tconst.ADJS:
+            return "adj"
+        if word in tconst.MIDDLE_WORDS:
+            return "prep"
+        return ""
     def detect_positions(self, wordlist, debug=False):
         """
         Detect named enteties words in a text and return positions of each phrase.
@@ -271,9 +336,10 @@ class myTemped(chunked.Chunked):
         positions = []
         start = -1
         end = -1
+        wordlist, word_taglist = self.preprocess(wordlist)
         taglist = self.detect_chunks(wordlist)
         if debug:
-            print("N", "tag", "start", "end", "word")        
+            print("N", "tag", "start", "end", "pos", "word")        
         for i, tag in enumerate(taglist):
             # 
             if tag == self.begintag:
@@ -290,7 +356,7 @@ class myTemped(chunked.Chunked):
                     start = -1
                     end = -1
             if debug:
-                print(i, tag, start, end, wordlist[i].encode('utf8'))
+                print(i, tag, start, end, word_taglist[i], wordlist[i].encode('utf8'))
         # add the final phrases
         if start >= 0:   #There are a previous number phrase.
             positions.append((start, end))

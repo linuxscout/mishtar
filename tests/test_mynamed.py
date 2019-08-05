@@ -38,9 +38,9 @@ if __name__ == '__main__':
 
         tag_list2 = chunker.detect_chunks(word_list)
 
-        #~ print chunker.detect_positions(word_list)
+        print "pos",chunker.detect_positions(word_list, debug=True)
 
-        #~ print repr(chunker.extract_chunks(text1)).decode('unicode-escape').encode('utf8') 
+        print "chunks", repr(chunker.extract_chunks(text1)).decode('unicode-escape').encode('utf8') 
         # extract chunks with context
         #~ print repr(chunker.extract_chunks(text1,context= True)).decode('unicode-escape').encode('utf8') 
         # predefined tashkeel 

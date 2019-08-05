@@ -45,8 +45,12 @@ class Chunked:
         started = False
         taglist = []
         previous = ""
-        wordlist = self.preprocess(wordlist)
+        wordlist, wordtag_list = self.preprocess(wordlist)
         for i, word_voc in enumerate(wordlist):
+            # get previous tag and next
+            prev_tag = wordtag_list[i-1] if i>0 else ""
+            next_tag = wordtag_list[i+1] if i<len(wordtag_list)-1 else ""
+                
             #save the original word with possible harakat if exist
             word = araby.strip_tashkeel(word_voc)
             if not started:
@@ -72,19 +76,20 @@ class Chunked:
                 
             else: # توجد سلسلة منطلقة
                 # الكلمة السابقة ليست موسومة، لكن الكلمة الحالية تجعلها كذلك
-                if self.is_middle_tuple_tag(word, previous):
+                if self.is_middle_tuple_tag(word, previous, next_tag):
                     taglist.append(self.intertag)
 
                 #:كلمة توسم بنفسها
                 elif self.is_wordtag(word):
                     taglist.append(self.intertag)
                 # الكلمة لا تكون موسومة إلا إذا كانت مسبوقة
-                elif self.is_middle_wordtag(word):
+                elif self.is_middle_wordtag(word, next_tag):
+                    # إذا كانت في آخر الجملة لا ت
+                    #~ taglist.append(self.intertag+"3")
                     taglist.append(self.intertag)
                 else:
                     taglist.append("0")
                     started = False;
-            
             previous = word
         wordlist, taglist = self.postprocess(wordlist, taglist)
         return taglist
@@ -104,7 +109,7 @@ class Chunked:
         """
         return False
 
-    def is_middle_wordtag(self, word):
+    def is_middle_wordtag(self, word, next_tag=""):
         """
         return if the word is a word tag only if there is a chunk
         @param word: the given word
@@ -112,7 +117,7 @@ class Chunked:
         """
         return False
 
-    def is_middle_tuple_tag(self, word, previous):
+    def is_middle_tuple_tag(self, word, previous, next_tag=""):
         """
         return if the word is a word tag only if there the previous word is an indicator
         @param word: the given word
@@ -126,8 +131,13 @@ class Chunked:
         @param wordlist: the given wordl_ist
         @type wordlist: unicode list
         """
+        taglist = []
         
-        return wordlist
+        for word in wordlist:
+            
+            taglist.append(self.tag_word(word))
+
+        return wordlist, taglist
 
     def postprocess(self, wordlist, taglist):
         """
@@ -137,6 +147,12 @@ class Chunked:
         """
         
         return wordlist, taglist
+
+    def tag_word(self, word):
+        """
+        give a tag to word
+        """
+        return ""        
 
     def extract_chunks(self, text, context=False):
         """
@@ -175,7 +191,7 @@ class Chunked:
         return phrases
 
 
-    def detect_positions(self, wordlist):
+    def detect_positions2(self, wordlist, debug=False):
         """
         Detect named enteties words in a text and return positions of each phrase.
 
@@ -207,6 +223,46 @@ class Chunked:
         if start >= 0:   #There are a previous number phrase.
             positions.append((start, end))
         return positions
+        
+    def detect_positions(self, wordlist, debug=False):
+        """
+        Detect named enteties words in a text and return positions of each phrase.
+        Example:
+            >>> detect_positions(wordlist)
+            ((1,3), (6,8))
+        @param wordlist: wordlist
+        @type wordlist: unicode list
+        @return: list of numbers clause positions [(start,end),(start2,end2),]
+        @rtype: list of tuple
+        """
+        positions = []
+        start = -1
+        end = -1
+        wordlist, word_taglist = self.preprocess(wordlist)
+        taglist = self.detect_chunks(wordlist)
+        if debug:
+            print("N", "tag", "start", "end", "pos", "word")        
+        for i, tag in enumerate(taglist):
+            # 
+            if tag == self.begintag:
+                if start < 0:
+                    start = i
+                end = i
+            elif tag == self.intertag:
+                end = i
+                if start < 0:
+                    start = i
+                #~ start = -1
+            elif start >= 0:
+                    positions.append((start, end))
+                    start = -1
+                    end = -1
+            if debug:
+                print(i, tag, start, end, word_taglist[i], wordlist[i].encode('utf8'))
+        # add the final phrases
+        if start >= 0:   #There are a previous number phrase.
+            positions.append((start, end))
+        return positions        
     @staticmethod
     def get_previous_tag(word):
         """Get the word tags

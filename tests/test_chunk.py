@@ -23,6 +23,7 @@ import sys
 sys.path.append('../')
 import mishtar.mytemped as mytemped
 import mishtar.mynamed as mynamed
+import mishtar.mynumber as mynumber
 
 
 import argparse
@@ -71,6 +72,8 @@ def factory_chuncker(name):
         return  mytemped.myTemped()
     elif name == "name":
         return  mynamed.myNamed()
+    elif name == "number":
+        return  mynumber.myNumber()
     else:
         return  mynamed.myNamed()
 if __name__ == '__main__':

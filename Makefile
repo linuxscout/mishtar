@@ -36,3 +36,13 @@ test:
 	pytest pyarabic/test_araby.py
 doc:
 	epydoc --config epydoc.conf
+
+temped:
+	cd tests; python test_chunk.py -c temp --debug -f samples/dataset.csv > output/temp.txt
+	tail -n 3 tests/output/temp.txt
+named:
+	cd tests; python test_chunk.py -c name --debug -f samples/nameddataset.csv > output/name.txt
+	tail -n 3 tests/output/name.txt
+number:
+	cd tests; python test_chunk.py -c number --debug  -f samples/numberdataset.csv > output/number.txt
+	tail -n 3 tests/output/number.txt
