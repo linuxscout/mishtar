@@ -107,9 +107,11 @@ if __name__ == '__main__':
     tests={"correct":0,
         "incorrect":0,
         "total":0,
+        "total_result":0,
 "test_correct":0,
         "test_incorrect":0,
         "test_total":0,        
+        "test_total_result":0,        
         }
     #~ debug  = True
     #~ chunker = mytemped.myTemped()
@@ -131,6 +133,7 @@ if __name__ == '__main__':
         print("Equal",equal, inequal)        
         tests['correct'] += equal
         tests['incorrect'] += inequal
+        tests['total_result'] += len(result)        
         
         if inequal and debug:
             # debug 
@@ -159,17 +162,28 @@ if __name__ == '__main__':
         equal, inequal = eval_score(targets, result)
         tests['test_correct'] += equal
         tests['test_incorrect'] += inequal
+        tests['test_total_result'] += len(result)
         
     tests['total'] =  tests['correct'] + tests['incorrect']
     tests['accuracy']= tests['correct']*100.0/tests['total']
+    tests['recall']= tests['correct']*100.0/tests['total']
+    tests['precision']= tests['correct']*100.0/tests['total_result']
+    tests['fscore']=  2* tests['precision']*tests['recall'] / (tests['precision']+tests['recall'])
     #~ print("Training", tests, "accuracy %.2f%%"%accuracy)
     
     tests['test_total'] =  tests['test_correct'] + tests['test_incorrect']
     tests['test_accuracy'] = tests['test_correct']*100.0/tests['test_total']
+    tests['test_recall']= tests['test_correct']*100.0/tests['test_total']
+    tests['test_precision']= tests['test_correct']*100.0/tests['test_total_result']
+    tests['test_fscore']=  2* tests['test_precision']*tests['test_recall'] / (tests['test_precision']+tests['test_recall'])
+
     #~ print("Test", tests, "accuracy %.2f%%"%accuracy)
-    print("\tAccu\tCorrect\tIncor.\tTotal");
-    print('Train\t%.2f\t%d\t%d\t%d'%(tests['accuracy'],tests['correct'], tests['incorrect'], tests['total']))
-    print('Test\t%.2f\t%d\t%d\t%d'%(tests['test_accuracy'],tests['test_correct'], tests['test_incorrect'], tests['test_total']))
-
-
+    print("\tPrec.\tRecall\tfscore\tAccu\tCorrect\tIncor.\tTotal");
+    print('Train\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%d\t%d'%(tests['precision'], tests['recall'], tests['fscore'] , tests['accuracy'],tests['correct'], tests['incorrect'], tests['total']))
+    print('Test\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%d\t%d'%(tests['test_precision'], tests['test_recall'], tests['test_fscore'] , tests['test_accuracy'],tests['test_correct'], tests['test_incorrect'], tests['test_total'])) 
+    #~ print('Test\t%.2f\t%d\t%d\t%d'%(tests['test_accuracy'],tests['test_correct'], tests['test_incorrect'], tests['test_total']))
+    # metrics
+    #~ Precision P= # of correct entities detected / # of entities detected (1)
+    #~ Recall R= # of correct entities detected / # of entities manually labeled (2)
+    #~ F1-score F= 2 P R / P+R
 

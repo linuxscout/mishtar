@@ -1,2 +1,11 @@
 *.pyc
 /tests/output/test.txt
+/mishtar/mytemped.old.py
+/mishtar/mytemped_const.old.py
+/rezki/mytemped.py
+/rezki/mytemped_const.py
+/tests/output/name.txt
+/tests/output/number.txt
+/tests/output/temp.txt
+/tests/output/test2.txt
+/tests/samples/.~lock.dataset.csv#
