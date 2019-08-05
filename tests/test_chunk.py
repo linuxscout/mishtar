@@ -186,4 +186,4 @@ if __name__ == '__main__':
     #~ Precision P= # of correct entities detected / # of entities detected (1)
     #~ Recall R= # of correct entities detected / # of entities manually labeled (2)
     #~ F1-score F= 2 P R / P+R
-
+    #  citation Mesfar, S. (2007, June). Named entity recognition for arabic using syntactic grammars. In International Conference on Application of Natural Language to Information Systems (pp. 305-316). Springer, Berlin, Heidelberg
