@@ -65,6 +65,34 @@ def eval_score(list_predef, list_predict):
         else:
             inequal += 1
     return equal, inequal
+    
+def evaluate(result_table):
+    """
+    Evaluate the result table
+    """
+    correct = 0
+    incorrect = 0
+    output_total = 0 # detected
+    tests={}
+    for item  in result_table:
+        targets = item.get("targets",[])
+        output = item.get("output",[])
+        equal, inequal = eval_score(targets, output)
+        correct += equal
+        incorrect += inequal
+        output_total += len(output)
+    total = correct +  incorrect
+    tests['correct'] = correct
+    tests['incorrect'] = incorrect
+    tests['total'] = total
+    tests['total_output'] = output_total
+    tests['accuracy']= correct*100.0/total
+    tests['recall']  = correct*100.0/total
+    tests['precision']= correct*100.0/output_total
+    
+    tests['fscore']=  2* tests['precision']*tests['recall'] / (tests['precision']+tests['recall'])
+    return tests
+    
 def factory_chuncker(name):
     """ create a chuncker """
 
@@ -79,12 +107,9 @@ def factory_chuncker(name):
 if __name__ == '__main__':
     args = grabargs()
     
-    filename = args.filename #"samples/dataset.csv"
-    #~ filename = "samples/dataset.csv"
+    filename = args.filename
     command = args.command 
     debug = args.debug 
-    #~ print(filename, command, debug)
-    #~ sys.exit()
     chunker = factory_chuncker(command)
     
     texts = []
@@ -97,29 +122,15 @@ if __name__ == '__main__':
             fields = line.split('\t')
             if len(fields) >= 3:
                 texts.append(fields)
-    #~ print(texts)
-    #~ sys.exit()
-    #~ texts =[
-#~ '* قسم واحد فقط: شهر نوفمبر سنة 2015، ',
-#~ u'* قسمين : شهر أكتوبر 1973، الخامس من نوفمبر، ',  
-#~ u'* ثلاثة اقسام: يوم الجمعة الخامس عشر من شهر رمضان سنة 1435 هجرية.',  
-    #~ ]
-    tests={"correct":0,
-        "incorrect":0,
-        "total":0,
-        "total_result":0,
-"test_correct":0,
-        "test_incorrect":0,
-        "test_total":0,        
-        "test_total_result":0,        
-        }
-    #~ debug  = True
-    #~ chunker = mytemped.myTemped()
     # training 
     limit = int(len(texts)*80/100)
     #ignore first line
     training_texts = texts[1:limit]
     test_texts = texts[limit:]
+    # result  table
+    result_table_train= []
+    result_table_test= []
+
     for key, item in enumerate(training_texts):
         text1 = item[0]
         # get all not null targets
@@ -128,12 +139,9 @@ if __name__ == '__main__':
         word_list = araby.tokenize(text1)
         tag_list2 = chunker.detect_chunks(word_list)
         result = chunker.extract_chunks(text1)
-
+        result_table_train.append({"text":text1, "targets":targets,"output":result})
         equal, inequal = eval_score(targets, result)
         print("Equal",equal, inequal)        
-        tests['correct'] += equal
-        tests['incorrect'] += inequal
-        tests['total_result'] += len(result)        
         
         if inequal and debug:
             # debug 
@@ -142,15 +150,8 @@ if __name__ == '__main__':
             print(arepr(result))
             print("target")
             print(arepr(targets))
-            #~ result2 = chunker.detect_chunks(word_list)        
-            #~ print(arepr(result2))        
             result2 = chunker.detect_positions(word_list, debug=True)        
             print(arepr(result2))            
-        
-        #~ tuples = (zip(tag_list2, word_list))
-        #~ for tup in tuples:
-            #~ print(repr(tup).decode('unicode-escape').encode('utf8'))
-
    
     # tests
     for item in test_texts:
@@ -159,29 +160,15 @@ if __name__ == '__main__':
         targets = [x.strip() for x in item[1:] if x.strip() ]
         targets = [araby.strip_tashkeel(x.strip()) for x in targets if x]
         result = chunker.extract_chunks(text1)
-        equal, inequal = eval_score(targets, result)
-        tests['test_correct'] += equal
-        tests['test_incorrect'] += inequal
-        tests['test_total_result'] += len(result)
-        
-    tests['total'] =  tests['correct'] + tests['incorrect']
-    tests['accuracy']= tests['correct']*100.0/tests['total']
-    tests['recall']= tests['correct']*100.0/tests['total']
-    tests['precision']= tests['correct']*100.0/tests['total_result']
-    tests['fscore']=  2* tests['precision']*tests['recall'] / (tests['precision']+tests['recall'])
-    #~ print("Training", tests, "accuracy %.2f%%"%accuracy)
-    
-    tests['test_total'] =  tests['test_correct'] + tests['test_incorrect']
-    tests['test_accuracy'] = tests['test_correct']*100.0/tests['test_total']
-    tests['test_recall']= tests['test_correct']*100.0/tests['test_total']
-    tests['test_precision']= tests['test_correct']*100.0/tests['test_total_result']
-    tests['test_fscore']=  2* tests['test_precision']*tests['test_recall'] / (tests['test_precision']+tests['test_recall'])
+        result_table_test.append({"text":text1, "targets":targets,"output":result})
 
-    #~ print("Test", tests, "accuracy %.2f%%"%accuracy)
-    print("\tPrec.\tRecall\tfscore\tAccu\tCorrect\tIncor.\tTotal");
-    print('Train\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%d\t%d'%(tests['precision'], tests['recall'], tests['fscore'] , tests['accuracy'],tests['correct'], tests['incorrect'], tests['total']))
-    print('Test\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%d\t%d'%(tests['test_precision'], tests['test_recall'], tests['test_fscore'] , tests['test_accuracy'],tests['test_correct'], tests['test_incorrect'], tests['test_total'])) 
-    #~ print('Test\t%.2f\t%d\t%d\t%d'%(tests['test_accuracy'],tests['test_correct'], tests['test_incorrect'], tests['test_total']))
+    #  Print metrics
+    print("\tPrec.\tRecall\tfscore\tAccu\tCorrect\tIncor.\toutput\tTotal");
+    tests = evaluate(result_table_train)
+    print('Train\t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%d\t%s\t%d'%(tests['precision'], tests['recall'], tests['fscore'] , tests['accuracy'],tests['correct'], tests['incorrect'], tests['total_output'], tests['total']))
+    tests = evaluate(result_table_test)
+    print('Test \t%.2f\t%.2f\t%.2f\t%.2f\t%d\t%d\t%s\t%d'%(tests['precision'], tests['recall'], tests['fscore'] , tests['accuracy'],tests['correct'], tests['incorrect'], tests['total_output'], tests['total']))
+    
     # metrics
     #~ Precision P= # of correct entities detected / # of entities detected (1)
     #~ Recall R= # of correct entities detected / # of entities manually labeled (2)
