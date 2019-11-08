@@ -94,6 +94,9 @@ if __name__ == '__main__':
             fields = line.split('\t')
             if len(fields) >= 3:
                 texts.append(fields)
+    if not texts:
+        print("Error on reading datafile, No Data to treat")
+        sys.exit()
     #~ print(texts)
     #~ sys.exit()
     #~ texts =[

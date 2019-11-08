@@ -1,4 +1,4 @@
-#!/usr/bin/python
+    #!/usr/bin/python
 # -*- coding=utf-8 -*-
 #
 """
@@ -24,10 +24,11 @@ if __name__ == '__main__':
 
     import sys
     sys.path.append('../')
-    import chunked
-    import mytemped_const as tconst    
+    sys.path.append('mishtar/')
+    import mishtar.chunked as chuncked
+    import mytemped_const as tconst
 else:
-    from . import chunked       
+    from mishtar import chunked
     from . import mytemped_const as tconst
 
 
@@ -41,7 +42,7 @@ class myTemped(chunked.Chunked):
         chunked.Chunked.__init__(self,)
         self.begintag = "NB"
         self.intertag = "NI"
-    
+
     def is_starttag(self, word):
         """
         return if the word is a start tag
@@ -49,16 +50,16 @@ class myTemped(chunked.Chunked):
         @type word: unicode
         """
         key = word
-        # if the word is precedded by a prefix, we extract the prefix and 
+        # if the word is precedded by a prefix, we extract the prefix and
         if word[0] in tconst.PREFIXES:
            key = word[1:]
         # كلمة ابن لا تأتي هكذا إلا في البداية
-        if key in tconst.ORDINAL2 or key in tconst.ORDINAL or key in tconst.ORDINAL1  or key in tconst.AWQAT or key in tconst.TEMPS :
+        if key in tconst.AWQAT  and key in tconst.ORDINAL2 :
            return True
         # if the word is  a word tag or as a prefixed word
         if self.is_wordtag(key):
             return True
-        
+
         return False
 
     def is_wordtag(self, word):
@@ -66,12 +67,13 @@ class myTemped(chunked.Chunked):
         return if the word is a word tag any where
         @param word: the given word
         @type word: unicode
-        
+
         """
-        
+
         # some words
-        if word in (u"شهر",u"عشرة",u"يوم",u"سنة",u"عام",u"اليوم",u"الشهر",u"العام",u"السنة",u"للسنة" ):
-            return True
+        if word in (u"يوم",u"مدة",u"شهر",u"سنة",u"عام",u"ليلة",u"اليوم",u"الليلة",u"",u"السنة",u"العام",u"القرن")   :
+             return True
+
         if word in tconst.DAYS:
             return True
         if word in tconst.MONTHS:
@@ -80,23 +82,24 @@ class myTemped(chunked.Chunked):
             return True
         if word in tconst.CALENDERS:
             return True
-        if word in tconst.PRE_NUMERIC:
-            return True
-        if word in tconst.TEMPS:
-            return True
+
+
         if word in tconst.AWQAT:
             return True
-        if word in tconst.ORDINAL2:
-            return True
+
         return False
         # calendar test if Heh for hijir or meem for Miladi
-        if word.endswith(araby.MEEM) or word.endswith(araby.HEH):
+        #if word.endswith(araby.MEEM) or word.endswith(araby.HEH):
+            #if word[:-1].isnumeric():
+                #return True
+        if word.endswith(u'م') or word.endswith(u'ه'):
             if word[:-1].isnumeric():
                 return True
-       
-    
-        if word and  word[0].isnumeric()  and word[1].isnumeric()  and word[2] in (u':')and word[3].isnumeric():
-            return True
+        if word.endswith(u'ــ') or word.endswith(u'هـ'):
+            if word[:-3].isnumeric():
+                return True
+
+
         return False
 
     def is_middle_wordtag(self, word, next_tag=""):
@@ -105,14 +108,27 @@ class myTemped(chunked.Chunked):
         @param word: the given word
         @type word: unicode
         """
-        
+
         #كلمة من لا تدخل إلا أذا سبقها ما يدل على الزمن
         # مثل السابع من شهر
         #الحرف / يستعمل للتفريق بين تسميتين للشهر
         if word in tconst.MIDDLE_WORDS and next_tag:
             return True
-        if word in tconst.ORDINAL1 and next_tag =="number":
+        if word in tconst.ORDINAL and next_tag =="number":
             return True
+        if word in tconst.ORDINAL2 and next_tag =="number":
+            return True
+        if word in tconst.ORDINAL2 and next_tag:
+            return True
+        if word in tconst.ORDINAL2 and next_tag in tconst.CALENDERS:
+            return True
+        if word in tconst.ORDINAL2 and next_tag in tconst.DAYS:
+            return True
+        if word in tconst.ORDINAL2 and next_tag in tconst.ORDINAL2:
+            return True
+
+
+
         # يدخل العدد في العبارة إذا سبقه شيء موسوم
         if word.isnumeric():
             return True
@@ -134,29 +150,82 @@ class myTemped(chunked.Chunked):
            previous = previous[2:]
         compsd = u" ".join([previous, word])
 
-        # من شهر
-        if previous in (u'من', u'في') and word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة" ,u"ليلة" ):
-           return True
-        #~ if word in (u'شهر', u"يوم", u"سنة", u"عام", u"اليوم", u"الشهر", u"العام", u"السنة" ,u"ليلة" ):
-           #~ return True
-        if previous in (u'من', u'في') and word in tconst.ORDINAL2 :
-           return True
+
+###اوائل القرن
+
+
+
+
+
+
+
+
+        if previous in tconst.ORDINAL2 and word in tconst.DAYS:
+            return True
+        if previous in tconst.ORDINAL and word in tconst.CALENDERS:
+            return True
+        #if previous in tconst.ORDINAL11 and word in tconst.CALENDERS:
+            #return True
+        if word in tconst.ORDINAL11 and next_tag in tconst.CALENDERS:
+            return True
+
+
+
+        if previous in (u"يوم",u"لمدة") and word in (u"أسابيع" ):
+             return True
+
+
         # من رمضان
-        if previous in (u'من',u'في') and word in tconst.MONTHS:
+        if previous in tconst.MIDDLE_WORDS and word in tconst.MONTHS:
+          return True
+        #if previous in tconst.MIDDLE_WORDS and word in tconst.AWQAT:
+         #  return True
+        if previous in tconst.MIDDLE_WORDS and word in tconst.DAYS:
            return True
+       # if previous in tconst.MIDDLE_WORDS and word in tconst.ORDINAL:
+         #  return True
+       # if previous in tconst.MIDDLE_WORDS and word in tconst.ORDINAL1:
+         #  return True
+       # if previous in tconst.MIDDLE_WORDS and word in tconst.ORDINAL2:
+          # return True
+       # if previous in tconst.MIDDLE_WORDS and word in tconst.TEMPS:
+         #  return True
         # اليوم عدد والشهر كلمة
         if previous.isnumeric() and word in tconst.MONTHS:
             return True
         if previous.isnumeric() and word in tconst.ORDINAL2:
             return True
-      
+        ##
+        if previous in (u'على') and word in tconst.ORDINAL2:
+            return True
+
+        #if word in tconst.ORDINAL2 and next_tag in tconst.DAYS:
+         #   return True
+
+
+
+         #تاريخ 14
+       # if word in (u'تاريخ',u'التاريخ') and next_tag in tconst.ORDINAL:
+          #  return True
+          #تاريخ 14
+       # if word in (u'تاريخ',u'التاريخ') and next_tag in tconst.ORDINAL1:
+           # return True
         #سنة وبعدها عدد
-        if previous in tconst.PRE_NUMERIC and word.isnumeric():
+        if previous in tconst.ORDINAL2 and word.isnumeric():
             return True
-        if previous in tconst.PRE_NUMERIC and word in tconst.ORDINAL:
+        if previous in tconst.ORDINAL2 and word in tconst.ORDINAL:
             return True
+        if previous in tconst.ORDINAL2 and word in tconst.ORDINAL1:
+            return True
+        if previous in tconst.ORDINAL2 and word in tconst.ORDINAL2:
+            return True
+
+        ##
+        if previous in tconst.ORDINAL2 and word in tconst.TEMPS:
+            return True
+
         ###
-        if previous in tconst.ORDINAL2 and word in (u'طويلة', u'قصيرة',u'طويلا', u'قصيرا',u"قليلة"):
+        if previous in tconst.ORDINAL2 and word in (u'طويلة', u'قصيرة',u'طويلا', u'قصيرا',u"قليلة",u"معدودة",u"معدودات"):
             return True
         ###
         if previous in tconst.CALENDERS and word in tconst.ORDINAL :
@@ -164,36 +233,88 @@ class myTemped(chunked.Chunked):
         ####
         if previous in tconst.CALENDERS and word in tconst.ORDINAL1 :
             return True
-        # القرن العشرين
-        if previous in tconst.PRE_NUMERIC or previous in tconst.ORDINAL2 and word in tconst.ORDINAL1:
+
+
+        #نة تقريباس
+        if previous in tconst.ORDINAL2 and word in (u"تقريبا",u"بالتقريب",u"قاربت",u"تقارب",u"أسابيع") :
             return True
-        #نة تقريباس 
-        if previous in tconst.ORDINAL2 and word in (u"تقريبا",u"بالتقريب",u"قاربت",u"تقارب") :
+        if previous in tconst.ORDINAL2 and word in (u"خمس",u"سبع",u"ثمان",u"تسع",u"عشر",u"ست") :
             return True
-        if previous in tconst.PRE_NUMERIC and word in (u"خمس",u"سبع",u"ثمان",u"تسع",u"عشر",u"ست") :
-            return True
-        if previous in tconst.ORDINAL1 and word in (u"أيام",u"اعوام",u"ايام",u"أعوام",u"سنين",u"سنوات",u"شهور",u"يوما",u"عاما",u"أسبوعا",u"سنة",u"شهرا") :
+        if previous in tconst.ORDINAL1 and word in (u"أيام",u"اعوام",u"ايام",u"أعوام",u"سنين",u"سنوات",u"شهور",u"يوما",u"عاما",u"أسبوعا",u"سنة",u"شهرا",u"اشهر",u"أشهر",u"أسابيع",u"اسابيع") :
             return True
         #وتسعة
-        if previous in tconst.PREFIXES and word in tconst.ORDINAL1 :
-            return True
+
         #سنة وبعدها عدد  وفي أخره ميم أو هاء
-        if previous in tconst.PRE_NUMERIC and word[:-1].isnumeric() and word[-1:] in (u'م',u'ه'):
+        if previous in tconst.ORDINAL2 and word[:-2].isnumeric() and word[-1:] in (u'م',u'ـ'):
+            return True
+        if previous in tconst.ORDINAL2 and word[:-3].isnumeric() and word[:-2] in (u"ق") and word[-1:] in (u'م',u'ه'):
+            return True
+        if previous in tconst.TEMPS and word.isnumeric():
             return True
 
-        
+        if previous in (u"ق") and word in (u"."):
+            return True
+        if previous.isnumeric() and word in (u"ق"):
+            return True
+        #heurs
+        if previous in (u":") and word.isnumeric():
+            return True
+        if previous.isnumeric() and word in (u":"):
+            return True
         #عدد وبعده تقويم
         #مثل  ميلادي
+        if compsd in tconst.MONTHS:
+            return True
         if previous.isnumeric() and word in tconst.CALENDERS:
             return True
+        if previous.isnumeric() and word in tconst.MIDDLE_WORDS:
+            return True
+
         if previous  in tconst.ORDINAL2  and word in tconst.CALENDERS:
+            return True
+        if previous  in tconst.ORDINAL2  and word in tconst.MONTHS:
             return True
         if previous  in tconst.ORDINAL1  and word in tconst.CALENDERS:
             return True
         if compsd in tconst.CALENDERS:
             return True
-        if compsd in tconst.MONTHS:
+
+
+            #les heurs
+        if previous in tconst.ORDINAL2 and word[:-3].isnumeric() and word[:-2] in (u"ق") and word[-1:] in (u'م',u'ه'):
             return True
+
+         #temps
+
+        if previous  in tconst.ORDINAL1  and word in tconst.TEMPS:
+            return True
+        if word  in tconst.ORDINAL11  and next_tag in tconst.TEMPS:
+            return True
+        if previous  in tconst.ORDINAL11  and word in tconst.ORDINAL2:
+            return True
+        if previous  in tconst.ORDINAL11  and word in tconst.CALENDERS:
+            return True
+        if previous  in tconst.ORDINAL  and word in tconst.TEMPS:
+            return True
+        if previous  in tconst.MIDDLE_WORDS  and word in tconst.TEMPS:
+            return True
+
+        if previous  in tconst.TEMPS  and word in tconst.ORDINAL:
+            return True
+        if previous  in tconst.TEMPS  and word in tconst.ORDINAL1:
+            return True
+
+                    #ordinal
+
+        if word in tconst.ORDINAL11 and next_tag in tconst.ORDINAL2:
+            return True
+
+
+
+        if previous  in tconst.ORDINAL  and word in tconst.ORDINAL11:
+
+            return True
+
 
         #شهر وبعده عدد
         if previous in tconst.MONTHS and word.isnumeric():
@@ -202,37 +323,45 @@ class myTemped(chunked.Chunked):
         if previous in tconst.MONTHS and word in tconst.ADJS:
             return True
         if compsd in tconst.MONTHS:
-            return True            
+            return True
         if previous in tconst.DAYS and word in tconst.ADJS:
             return True
         if previous in tconst.ORDINAL2 and word in tconst.ADJS:
             return True
+        if previous in tconst.ADJS and word in tconst.ORDINAL2:
+            return True
         if previous in tconst.ORDINAL2 and word in tconst.ORDINAL:
             return True
+        if previous in tconst.ORDINAL2 and word in tconst.TEMPS:
+            return True
+
         if previous in tconst.ORDINAL and word in tconst.ORDINAL1:
             return True
+        if previous in tconst.ORDINAL1 and word in tconst.ORDINAL2:
+            return True
+        if previous in tconst.ORDINAL11 and word in tconst.ORDINAL2:
+            return True
+
         if previous in tconst.ORDINAL2 and word in tconst.ORDINAL1:
             return True
         #عدد ترتيبي ثم حرف من
         if previous in  tconst.ORDINAL and word in (u"من",):
             return True
-
-
-        if previous in  (u"في",) and word.isnumeric() :
+           #الفاتح من
+        if previous in  (u"الفاتح") and word in (u"من",):
             return True
 
-
-
-        if previous in  tconst.PREFIXES and word in tconst.TEMPS:
-            return True
 
 
         if previous in  tconst.TEMPS and word in tconst.ORDINAL:
             return True
 
+        if previous in  tconst.MIDDLE_WORDS and word in tconst.CALENDERS:
+            return True
 
-        
         if compsd in tconst.ORDINAL:
+            return True
+        if compsd in tconst.CALENDERS:
             return True
         if compsd in tconst.COMPOSED:
             return True
@@ -271,25 +400,25 @@ class myTemped(chunked.Chunked):
         return newlist
     def preprocess(self, wordlist):
         """
-        Make preprocessing for some cases 
+        Make preprocessing for some cases
         @param wordlist: the given wordl_ist
         @type wordlist: unicode list
         """
         taglist = []
-        
+
         for word in wordlist:
-            
+
             taglist.append(self.tag_word(word))
 
         return wordlist, taglist
-        
+
     def postprocess(self, wordlist, taglist):
         """
-        Make preprocessing for some cases 
+        Make preprocessing for some cases
         @param wordlist: the given wordl_ist
         @type wordlist: unicode list
         """
-        
+
         return wordlist, taglist
 
     def tag_word(self, word):
@@ -339,9 +468,9 @@ class myTemped(chunked.Chunked):
         wordlist, word_taglist = self.preprocess(wordlist)
         taglist = self.detect_chunks(wordlist)
         if debug:
-            print("N", "tag", "start", "end", "pos", "word")        
+            print("N", "tag", "start", "end", "pos", "word")
         for i, tag in enumerate(taglist):
-            # 
+            #
             if tag == self.begintag:
                 if start < 0:
                     start = i
@@ -368,16 +497,16 @@ if __name__ == '__main__':
     test_tuples =[
  ("""أعداد معتصمي النهضة وصل عصر يوم الجمعة التاسع من أغسطس/آب 2013 -وهو أحد أيام الكثافة العددية.""",
 [u'يوم الجمعة التاسع من أغسطس / آب 2013',]),
-("""منذ مذبحة رابعة في الـ14 من أغسطس/آب 2013، تتشابه حكاياتهم ومآسي من تركوهم 
-وفي هذا السياق، يرى المتحدث  أن النظام المصري سيتخلص ممن شارك في ثورة 25 يناير 2011، """, 
+("""منذ مذبحة رابعة في الـ14 من أغسطس/آب 2013، تتشابه حكاياتهم ومآسي من تركوهم
+وفي هذا السياق، يرى المتحدث  أن النظام المصري سيتخلص ممن شارك في ثورة 25 يناير 2011، """,
 [u'الـ14 من أغسطس/آب 2013',u' 25 يناير 2011', ]),
 ("""وانتقد عدد من النشطاء الحقوقيين المحليين المذبحة، وقال المدون وائل عباس إن أعداد ضحايا الفض لم يسبق له مثيل في مصر منذ حرب أكتوبر 1973 ونكسة 1967، مشيرا إلى أنه حادث إجرامي يجب أن يحاسب مرتكبوه، وأشار الناشط السياسي علاء عبد الفتاح إلى أنها مجزرة أسوأ من الكوابيس والخيالات.""",
 
 [u'أكتوبر 1973', ]),
 
 ("""وحتى خلال الهبة -التي تشهدها الأراضي الفلسطينية منذ أكتوبر/تشرين الأول 2015- في الضفة الغربية """,
-  [u'أكتوبر / تشرين الأول 2015', ]), 
-     
+  [u'أكتوبر / تشرين الأول 2015', ]),
+
 (u'يتكون من  اسم يوم الأسبوع لفظايتكون من  اسم يوم الأسبوع لفظا مثل ',  [] ),
 (u'* الجمعة',  [u'الجمعة'] ),
 (u'* يوم الأحد',  [u'يوم الأحد'] ),
@@ -431,7 +560,7 @@ if __name__ == '__main__':
 (u'15 ق.م. ',  [u'15 ق.م. '],),
 (u'""تتركب العبارة التاريخية من :"',  [] ),
 (u'* قسم واحد فقط: سنة 2015، شهر نوفمبر',  [u'سنة 2015', u'شهر نوفمبر'] ),
-(u'* قسمين : شهر أكتوبر 1973، الخامس من نوفمبر، ',  [u'شهر أكتوبر 1973', u'الخامس من نوفمبر'] ),
+(u'*  الساعة 05:22 قسمين : شهر أكتوبر 1973، الخامس من نوفمبر، ',  [u'شهر أكتوبر 1973', u'الخامس من نوفمبر'] ),
 (u'* ثلاثة اقسام: يوم الجمعة الخامس عشر من شهر رمضان سنة 1435 هجرية.',  [u'يوم الجمعة الخامس عشر من شهر رمضان سنة 1435 هجرية'] ),
 
     ]
