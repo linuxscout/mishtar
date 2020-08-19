@@ -79,22 +79,19 @@ You can test it on [Mishkal Site](http://tahadz.com/mishkal), choose: Tool > ext
 ![mishtar Demo](doc/images/mishtar_demo.png "mishtar Demo")
 
 
-<!--
-Installation
-=====
+
+### Installation
+
 ```
 pip install mishtar
-```    
-    -->
-Usage
-=====
+```
+
+### Usage
 ```python
 import mishtar.mynamed as mynamed
 ```
-Example
-=====
-Test named entities
-======
+* Example **Test named entities**
+
 ```python
 import mishtar.mynamed
 import pyarabic.araby as araby
@@ -104,16 +101,15 @@ TEXTS = [
  المغربي أنّ عقابا بن مسعود بن أبي سعاد قال''',
     u"صرّح الأمير تشارلز الأول",
 ]
+chunker = mishtar.mynamed.myNamed()
 for text1 in TEXTS:
     word_list = araby.tokenize(text1)
-    chunker = mishtar.mynamed.myNamed()
     tag_list2 = chunker.detect_chunks(word_list)
-
     result = chunker.pretashkeel(word_list)
-    print "tashkeel", (u' '.join(result))
+    print("tashkeel", (u' '.join(result)))
     tuples = (zip(tag_list2, word_list))
     for tup in tuples:
-        print tup
+        print(tup)
 ****Result ****
  المغربي أنّ عقابا بْنَ مسعود بْنِ أبي سعاد قال
 (u'0', u'روى')
@@ -141,8 +137,8 @@ tashkeel صرّح الأمير تشارلز الأول
 (u'0', u'الأول')
 ```
 
-Test Temporal expressions
-======
+* Test Temporal expressions
+
 
 ```python
 import pyarabic.araby as araby

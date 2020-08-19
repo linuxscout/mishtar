@@ -28,7 +28,7 @@ wheel:
 wheel3:
 	sudo python3 setup.py bdist_wheel
 sdist:
-	sudo python setup.py sdist
+	sudo python3 setup.py sdist
 upload:
 	echo "use twine upload dist/PyArabic-0.6.1.tar.gz"
 	
@@ -38,11 +38,11 @@ doc:
 	epydoc --config epydoc.conf
 
 temped:
-	cd tests; python test_chunk.py -c temp --debug -f samples/dataset.csv > output/temp.txt
+	cd tests; python3 test_chunk.py -c temp --debug -f samples/dataset.csv > output/temp.txt
 	tail -n 3 tests/output/temp.txt
 named:
-	cd tests; python test_chunk.py -c name --debug -f samples/nameddataset.csv > output/name.txt
+	cd tests; python3 test_chunk.py -c name --debug -f samples/nameddataset.csv > output/name.txt
 	tail -n 3 tests/output/name.txt
 number:
-	cd tests; python test_chunk.py -c number --debug  -f samples/numberdataset.csv > output/number.txt
+	cd tests; python3 test_chunk.py -c number --debug  -f samples/numberdataset.csv > output/number.txt
 	tail -n 3 tests/output/number.txt

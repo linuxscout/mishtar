@@ -70,6 +70,8 @@ def evaluate(result_table):
     """
     Evaluate the result table
     """
+    #~ print(result_table)
+    #~ sys.exit()
     correct = 0
     incorrect = 0
     output_total = 0 # detected
@@ -85,6 +87,8 @@ def evaluate(result_table):
     tests['correct'] = correct
     tests['incorrect'] = incorrect
     tests['total'] = total
+    if not total :
+        tests['total'] = 1
     tests['total_output'] = output_total
     tests['accuracy']= correct*100.0/total
     tests['recall']  = correct*100.0/total
@@ -104,6 +108,8 @@ def factory_chuncker(name):
         return  mynumber.myNumber()
     else:
         return  mynamed.myNamed()
+
+
 if __name__ == '__main__':
     args = grabargs()
     
@@ -115,13 +121,20 @@ if __name__ == '__main__':
     texts = []
     # the file contains three fields (input text, first output, second output)
     # output can be null
-    with open(filename) as fl:
-        for line in fl :
-        #line = fl.readline()
-            line = line.decode('utf8')
-            fields = line.split('\t')
-            if len(fields) >= 3:
-                texts.append(fields)
+    try:
+        with open(filename) as fl:
+            for line in fl :
+            #line = fl.readline()
+                line = line.strip()
+                fields = line.split('\t')
+                if len(fields) >= 2:
+                    texts.append(fields)
+    except:
+        print("Can't Open file", filename)
+        sys.exit()
+    if not texts:
+        print("No Data to handle, check your file is tab separated", filename)
+        sys.exit()
     # training 
     limit = int(len(texts)*80/100)
     #ignore first line

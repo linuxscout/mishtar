@@ -213,7 +213,7 @@ if __name__ == '__main__':
         u"صرّح الأمير تشارلز الأول",
     ]
     for text1 in TEXTS:
-        print "#######"
+        print("#######")
         positions_named = named.detect_named_position(text1.split(' '))
         print(positions_named)
         text1 = araby.strip_tashkeel(text1)
@@ -227,19 +227,19 @@ if __name__ == '__main__':
 
         tuples = (zip(tag_list, word_list))
         for tup in tuples:
-            print repr(tup).decode('unicode-escape').encode('utf8')
-        print "***********"
+            print(repr(tup).decode('unicode-escape').encode('utf8'))
+        print("***********")
         chunker = myNamed()
         tag_list2 = chunker.detect_chunks(word_list)
-        print chunker.detect_positions(word_list)
-        print repr(chunker.extract_chunks(text1)).decode('unicode-escape').encode('utf8') 
+        print(chunker.detect_positions(word_list))
+        print(repr(chunker.extract_chunks(text1)).decode('unicode-escape').encode('utf8') )
         # extract chunks with context
-        print repr(chunker.extract_chunks(text1,context= True)).decode('unicode-escape').encode('utf8') 
+        print(repr(chunker.extract_chunks(text1,context= True)).decode('unicode-escape').encode('utf8') )
         # predefined tashkeel 
         result = chunker.pretashkeel(word_list)
-        print "tashkeel", (u' '.join(result))
+        print("tashkeel", (u' '.join(result)))
         tuples = (zip(tag_list2, word_list))
         for tup in tuples:
-            print repr(tup).decode('unicode-escape').encode('utf8')           
+            print(repr(tup).decode('unicode-escape').encode('utf8') )
 
 

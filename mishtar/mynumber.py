@@ -344,27 +344,27 @@ if __name__ == '__main__':
     for txt in TEXTS:
         word_list = araby.tokenize(txt)
         positions_phrases = number.detect_number_phrases_position(word_list)
-        print "*******"
-        print(txt).encode('utf8')
+        print("*******")
+        print(txt)
         print("positions", positions_phrases)
         nb_phrases = number.extract_number_phrases(txt)
         tag_list = number.detect_numbers(word_list)
         for tup in zip(tag_list, word_list):
-            print repr(tup).decode('unicode-escape').encode('utf8')
+            print(tup)
         
-        print "tashkeel", repr(number.pre_tashkeel_number(word_list)).decode('unicode-escape').encode('utf8')
+        print("tashkeel", repr(number.pre_tashkeel_number(word_list)))
 
         mynumber = myNumber()
         positions_phrases2 = mynumber.detect_positions(word_list)
-        print "#########"
-        print(txt).encode('utf8')
+        print("#########")
+        print(txt)
         print("positions", positions_phrases2)
         tag_list2 = mynumber.detect_chunks(word_list)
         for tup in zip(tag_list2, word_list):
-            print repr(tup).decode('unicode-escape').encode('utf8')
+            print(tup)
         
-        print "tashkeel", repr(mynumber.pretashkeel(word_list)).decode('unicode-escape').encode('utf8')
+        print("tashkeel", mynumber.pretashkeel(word_list))
         if tag_list2  != tag_list:
-            print "error"
+            print("error")
             for tup in zip(tag_list, tag_list2, word_list):
-                print repr(tup).decode('unicode-escape').encode('utf8')
+                print(tup)

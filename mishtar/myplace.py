@@ -144,11 +144,11 @@ if __name__ == '__main__':
 
         myplace = myPlace()
         positions_phrases2 = myplace.detect_positions(word_list)
-        print "#########"
-        print(txt).encode('utf8')
+        print("#########")
+        print(txt)
         print("positions", positions_phrases2)
         tag_list2 = myplace.detect_chunks(word_list)
         for tup in zip(tag_list2, word_list):
-            print repr(tup).decode('unicode-escape').encode('utf8')
+            print(tup)
         
-        print "tashkeel", repr(myplace.pretashkeel(word_list)).decode('unicode-escape').encode('utf8')
+        print("tashkeel", myplace.pretashkeel(word_list))
